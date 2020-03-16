@@ -24,19 +24,14 @@ def init_db():
         db = get_db()
         cursor = db.cursor()
         cursor.executescript(
-            """CREATE TABLE IF NOT EXISTS TVShows
+            """DROP TABLE IF EXISTS TVShows;
+               CREATE TABLE TVShows
                (id integer primary key, 
                show text not null,
                episode text not null, 
                subtitles text,
                site text not null)"""
         )
-
-        cursor.execute("SELECT * FROM TVShows")
-        res = cursor.fetchall()
-        if len(res) != 0:
-            return
-
         parse_fanserials()
 
 
@@ -48,15 +43,6 @@ def get_all():
     result = db_cursor.fetchall()
     json_result = json.dumps([dict(row) for row in result])
     return json_result
-
-
-"""
-@app.route('/')
-def init_site():
-    parse_fanserials()
-    # more sites
-    return redirect('/get_all')
-"""
 
 
 def add_to_db(data, site):
@@ -89,7 +75,7 @@ def parse_fanserials():
         subs = ""
         for sub in subtitles_raw:
             # subs += sub.text + f": {url}" + sub.find("a").get("href")[1:] + "\n"
-            subs += f'<a href=\"{url}' + sub.find("a").get("href")[1:] + "\">" + sub.text + "</a><br>"
+            subs += f'<a href=\"{url}{sub.find("a").get("href")[1:]}\">{sub.text}</a><br>'
 
         row = {
             'show': name,
