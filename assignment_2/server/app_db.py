@@ -32,11 +32,12 @@ def init_db():
                subtitles text,
                site text not null)"""
         )
-        parse_fanserials()
+        db.commit()
 
 
 @app.route('/get_all')
 def get_all():
+    parse_fanserials()
     db_cursor = get_db().cursor()
     db_cursor.row_factory = sqlite3.Row
     db_cursor.execute("SELECT * From TVShows")
@@ -53,7 +54,8 @@ def add_to_db(data, site):
         query = f"INSERT INTO TVShows (show, episode, subtitles, site) VALUES (?, ?, ?, ?)"
         print(row["show"], row["episode"], row["subtitles"], site)
         cursor.execute(query, (row["show"], row["episode"], row["subtitles"], site,))
-        db.commit()
+
+    db.commit()
 
 
 def parse_fanserials():
