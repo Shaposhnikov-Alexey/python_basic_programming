@@ -1,6 +1,5 @@
 import os
 import cv2
-import sys
 import face_recognition
 import numpy as np
 from flask import Flask, flash, request, redirect, url_for, \
