@@ -22,15 +22,9 @@ def apply_affine_transform(src, src_tri, dst_tri, size):
 
 
 def rect_contains(rect, point):
-    if point[0] < rect[0]:
-        return False
-    elif point[1] < rect[1]:
-        return False
-    elif point[0] > rect[0] + rect[2]:
-        return False
-    elif point[1] > rect[1] + rect[3]:
-        return False
-    return True
+    x_inside = rect[0] <= point[0] <= rect[0] + rect[2]
+    y_inside = rect[1] <= point[1] <= rect[1] + rect[3]
+    return x_inside and y_inside
 
 
 def calculate_delaunay_triangles(rect, points):
@@ -46,19 +40,14 @@ def calculate_delaunay_triangles(rect, points):
     pt = []
 
     for t in triangle_list:
-        pt.append((t[0], t[1]))
-        pt.append((t[2], t[3]))
-        pt.append((t[4], t[5]))
-
-        pt1 = (t[0], t[1])
-        pt2 = (t[2], t[3])
-        pt3 = (t[4], t[5])
+        pt1, pt2, pt3 = [(t[i], t[i + 1]) for i in [0, 2, 4]]
+        pt += [pt1, pt2, pt3]
 
         if rect_contains(rect, pt1) and rect_contains(rect, pt2) and rect_contains(rect, pt3):
             ind = []
             for j in range(0, 3):
                 for k in range(0, len(points)):
-                    if (abs(pt[j][0] - points[k][0]) < 1.0 and abs(pt[j][1] - points[k][1]) < 1.0):
+                    if abs(pt[j][0] - points[k][0]) < 1.0 and abs(pt[j][1] - points[k][1]) < 1.0:
                         ind.append(k)
             if len(ind) == 3:
                 delaunay_tri.append((ind[0], ind[1], ind[2]))
